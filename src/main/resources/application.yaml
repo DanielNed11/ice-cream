@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: Ice cream
+  profiles:
+    active: dev
+  config:
+    import: optional:file:.env[.properties]
+  jpa:
+    open-in-view: false
+server:
+  port: 8080
+---
+# For production
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    url: ${DATASOURCE_URL}
+    password: ${DATASOURCE_PASSWORD}
+
+---
+# For development
+spring:
+  config:
+    activate:
+      on-profile: dev
