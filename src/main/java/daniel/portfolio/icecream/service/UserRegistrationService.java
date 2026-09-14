@@ -1,6 +1,7 @@
 package daniel.portfolio.icecream.service;
 
 import daniel.portfolio.icecream.model.AppUser;
+import daniel.portfolio.icecream.model.Role;
 import daniel.portfolio.icecream.repository.AppUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -30,6 +31,7 @@ public class UserRegistrationService {
         appUser.setName(name);
         appUser.setEmail(email);
         appUser.setPassword(passwordEncoder.encode(rawPassword));
+        appUser.setRole(Role.CUSTOMER);
 
         try {
             appUserRepository.save(appUser);
