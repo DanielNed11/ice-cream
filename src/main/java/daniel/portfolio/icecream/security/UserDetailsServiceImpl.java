@@ -7,6 +7,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
@@ -18,5 +21,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return appUserRepository.findByEmail(email)
                 .map(CustomUser::buildUser)
                 .orElseThrow(() -> new UsernameNotFoundException(email));
+    }
+
+    public Optional<CustomUser> loadUserById(UUID id) {
+        return appUserRepository.findById(id).map(CustomUser::buildUser);
     }
 }

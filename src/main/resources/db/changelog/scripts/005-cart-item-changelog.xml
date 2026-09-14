@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-5.0.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="01-create-table" author="daniel">
+        <createTable tableName="cart_item">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_cartitem"/>
+            </column>
+            <column name="cart_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_cartitem_on_cart"
+                             references="cart(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="product_id" type="UUID">
+                <constraints nullable="false"
+                             foreignKeyName="fk_cartitem_on_product"
+                             references="product(id)"/>
+            </column>
+            <column name="quantity" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="cart_item"
+                              columnNames="cart_id, product_id"
+                              constraintName="uq_cartitem_cart_product"/>
+    </changeSet>
+</databaseChangeLog>
