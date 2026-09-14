@@ -10,5 +10,6 @@ public class Constants {
     public static final String TOKEN_EXPIRED = "Token expired";
     public static final String AUTHENTICATION_REQUIRED = "Authentication required";
     public static final String SERVICE_UNAVAILABLE = "Service temporarily unavailable";
+    public static final String PRODUCT_NOT_FOUND = "Product not found";
 
 }

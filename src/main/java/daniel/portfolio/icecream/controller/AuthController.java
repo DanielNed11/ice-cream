@@ -8,6 +8,10 @@ import daniel.portfolio.icecream.security.CustomUser;
 import daniel.portfolio.icecream.security.jwt.JwtService;
 import daniel.portfolio.icecream.security.jwt.RefreshTokenService;
 import daniel.portfolio.icecream.service.UserRegistrationService;
+import daniel.portfolio.icecream.swagger.LoginApiDocs;
+import daniel.portfolio.icecream.swagger.LogoutApiDocs;
+import daniel.portfolio.icecream.swagger.RefreshApiDocs;
+import daniel.portfolio.icecream.swagger.RegisterApiDocs;
 import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -34,12 +38,14 @@ public class AuthController {
     private final UserRegistrationService userRegistrationService;
 
     @PostMapping("/register")
+    @RegisterApiDocs
     public ResponseEntity<@NonNull AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         UUID userId = userRegistrationService.register(request.name(), request.email(), request.password());
         return ResponseEntity.status(HttpStatus.CREATED).body(issueTokens(userId));
     }
 
     @PostMapping("/login")
+    @LoginApiDocs
     public ResponseEntity<@NonNull AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.email(), request.password()));
@@ -50,6 +56,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @RefreshApiDocs
     public AuthResponse refresh(@RequestHeader(REFRESH_TOKEN_HEADER) String refreshToken) {
         RefreshTokenService.RotatedTokens rotated = refreshTokenService.rotate(refreshToken);
         String accessToken = jwtService.generateToken(rotated.userId());
@@ -57,6 +64,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @LogoutApiDocs
     public ResponseEntity<@NonNull Void> logout(@AuthenticationPrincipal CustomUser principal) {
         refreshTokenService.revokeAllForUser(principal.getId());
         return ResponseEntity.noContent().build();

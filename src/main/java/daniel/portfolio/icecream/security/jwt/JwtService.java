@@ -1,5 +1,6 @@
 package daniel.portfolio.icecream.security.jwt;
 
+import daniel.portfolio.icecream.logging.Sensitive;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -29,6 +30,7 @@ public class JwtService {
         secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
     }
 
+    @Sensitive
     public String generateToken(UUID userId) {
         return Jwts.builder()
                 .subject(userId.toString())
@@ -38,7 +40,7 @@ public class JwtService {
                 .compact();
     }
 
-    public UUID validateAndGetSubject(String token) {
+    public UUID validateAndGetSubject(@Sensitive String token) {
         Jws<Claims> jws = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()

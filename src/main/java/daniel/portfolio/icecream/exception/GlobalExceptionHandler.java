@@ -2,6 +2,7 @@ package daniel.portfolio.icecream.exception;
 
 import daniel.portfolio.icecream.security.jwt.InvalidRefreshTokenException;
 import daniel.portfolio.icecream.service.EmailAlreadyRegisteredException;
+import daniel.portfolio.icecream.service.ProductNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -92,6 +93,14 @@ public class GlobalExceptionHandler {
             HttpServletRequest request
     ) {
         return build(HttpStatus.BAD_REQUEST, "Required header '" + ex.getHeaderName() + "' is missing", request);
+    }
+
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<@NonNull ErrorResponse> handleProductNotFound(
+            ProductNotFoundException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.NOT_FOUND, PRODUCT_NOT_FOUND, request);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)

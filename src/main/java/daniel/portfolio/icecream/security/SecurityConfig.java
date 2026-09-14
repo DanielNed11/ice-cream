@@ -1,10 +1,12 @@
 package daniel.portfolio.icecream.security;
 
 import daniel.portfolio.icecream.constants.AuthApiPaths;
+import daniel.portfolio.icecream.constants.ProductApiPaths;
 import daniel.portfolio.icecream.security.jwt.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -60,6 +62,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(req -> req
                         .requestMatchers(AuthApiPaths.REGISTER, AuthApiPaths.LOGIN, AuthApiPaths.REFRESH).permitAll()
+                        .requestMatchers(HttpMethod.GET, ProductApiPaths.PRODUCTS_BASE, ProductApiPaths.PRODUCTS_BASE + "/**").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated())

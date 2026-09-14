@@ -1,5 +1,6 @@
 package daniel.portfolio.icecream.security.jwt;
 
+import daniel.portfolio.icecream.logging.Sensitive;
 import daniel.portfolio.icecream.model.RefreshToken;
 import daniel.portfolio.icecream.repository.AppUserRepository;
 import daniel.portfolio.icecream.repository.RefreshTokenRepository;
@@ -30,6 +31,7 @@ public class RefreshTokenService {
     @Value("${jwt.refresh-expiration}")
     private long refreshExpiration;
 
+    @Sensitive
     public String issue(UUID userId) {
         String rawToken = generateRawToken();
 
@@ -42,8 +44,9 @@ public class RefreshTokenService {
         return rawToken;
     }
 
+    @Sensitive
     @Transactional
-    public RotatedTokens rotate(String rawToken) {
+    public RotatedTokens rotate(@Sensitive String rawToken) {
         RefreshToken existing = refreshTokenRepository.findByTokenHash(hash(rawToken))
                 .orElseThrow(() -> new InvalidRefreshTokenException("Refresh token not recognized"));
 
