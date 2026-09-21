@@ -7,7 +7,9 @@ import daniel.portfolio.icecream.service.CartService;
 import daniel.portfolio.icecream.swagger.GetCartApiDocs;
 import daniel.portfolio.icecream.swagger.UpsertCartItemApiDocs;
 import jakarta.validation.Valid;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -24,16 +26,16 @@ public class CartController {
 
     @GetMapping
     @GetCartApiDocs
-    public CartResponse getCart(@AuthenticationPrincipal CustomUser principal) {
-        return cartService.getCart(principal.getId());
+    public ResponseEntity<@NonNull CartResponse> getCart(@AuthenticationPrincipal CustomUser principal) {
+        return ResponseEntity.ok(cartService.getCart(principal.getId()));
     }
 
     @PutMapping("/items")
     @UpsertCartItemApiDocs
-    public CartResponse upsertItem(
+    public ResponseEntity<@NonNull CartResponse> upsertItem(
             @AuthenticationPrincipal CustomUser principal,
             @Valid @RequestBody UpsertCartItemRequest request
     ) {
-        return cartService.upsertItem(principal.getId(), request.slug(), request.quantity());
+        return ResponseEntity.ok(cartService.upsertItem(principal.getId(), request.slug(), request.quantity()));
     }
 }

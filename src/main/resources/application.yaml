@@ -1,12 +1,23 @@
 spring:
   application:
-    name: Ice cream
+    name: nano-ice-cream
   profiles:
     active: dev
   config:
     import: optional:file:.env[.properties]
   jpa:
     open-in-view: false
+  threads:
+    virtual:
+      enabled: true
+  mail:
+    properties:
+      mail:
+        smtp:
+          connectiontimeout: 5000
+          timeout: 10000
+          writetimeout: 10000
+
 server:
   port: 8080
 
@@ -14,6 +25,18 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: 900000 # 15 minutes, in ms
   refresh-expiration: 604800000 # 7 days, in ms
+
+app:
+  delivery:
+    cron: "0 0 14 * * *"
+    zone: "Europe/Sofia"
+  restock:
+    cron: "0 0 3 * * *"
+    zone: "Europe/Sofia"
+    amount: 10
+  mail:
+    from-name: "Nano Protein Ice Cream"
+
 
 ---
 # For production
@@ -24,6 +47,17 @@ spring:
   datasource:
     url: ${DATASOURCE_URL}
     password: ${DATASOURCE_PASSWORD}
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 springdoc:
   api-docs:
@@ -34,6 +68,9 @@ springdoc:
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS}
+  mail:
+    from: ${MAIL_USERNAME}
+  frontend-url: ${FRONTEND_URL}
 
 ---
 # For development
@@ -41,7 +78,13 @@ spring:
   config:
     activate:
       on-profile: dev
+  mail:
+    host: localhost
+    port: 1025
 
 app:
   cors:
     allowed-origins: http://localhost:3000
+  mail:
+    from: ${MAIL_USERNAME}
+  frontend-url: http://localhost:3000

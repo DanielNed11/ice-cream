@@ -1,4 +1,4 @@
-package daniel.portfolio.icecream.service;
+package daniel.portfolio.icecream.exception;
 
 public class EmailAlreadyRegisteredException extends RuntimeException {
 

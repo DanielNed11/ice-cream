@@ -1,5 +1,6 @@
 package daniel.portfolio.icecream.security.jwt;
 
+import daniel.portfolio.icecream.exception.InvalidRefreshTokenException;
 import daniel.portfolio.icecream.logging.Sensitive;
 import daniel.portfolio.icecream.model.RefreshToken;
 import daniel.portfolio.icecream.repository.AppUserRepository;

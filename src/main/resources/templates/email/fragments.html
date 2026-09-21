@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Text wordmark rather than an image: most clients hide remote images
+     until the reader allows them. -->
+<div th:fragment="header" style="padding: 24px 0; border-bottom: 3px solid #F4C430;">
+    <span style="font-size: 26px; font-weight: bold; letter-spacing: 5px; color: #111111;">NANO</span>
+    <span style="font-size: 12px; letter-spacing: 2px; color: #777777;">PROTEIN ICE CREAM</span>
+</div>
+
+<div th:fragment="footer(frontendUrl)" style="margin-top: 32px; padding-top: 16px; border-top: 1px solid #eeeeee; font-size: 12px; color: #888888;">
+    <p style="margin: 0 0 4px;">
+        You're receiving this because you placed an order at
+        <a th:href="${frontendUrl}" th:text="${frontendUrl}" style="color: #888888;">nano ice cream</a>.
+    </p>
+    <p style="margin: 0;">This is a portfolio demo - no real ice cream will be delivered.</p>
+</div>
+
+</body>
+</html>

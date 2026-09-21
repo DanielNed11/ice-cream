@@ -4,7 +4,9 @@ import daniel.portfolio.icecream.constants.ProductApiPaths;
 import daniel.portfolio.icecream.controller.response.ProductResponse;
 import daniel.portfolio.icecream.service.ProductService;
 import daniel.portfolio.icecream.swagger.ListProductsApiDocs;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +22,7 @@ public class ProductController {
 
     @GetMapping
     @ListProductsApiDocs
-    public List<ProductResponse> listProducts() {
-        return productService.listAll();
+    public ResponseEntity<@NonNull List<ProductResponse>> listProducts() {
+        return ResponseEntity.ok(productService.listActive());
     }
 }

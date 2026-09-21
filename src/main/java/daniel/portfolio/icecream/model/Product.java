@@ -27,4 +27,7 @@ public class Product extends Auditable {
 
     @Column(name = "stock_quantity", nullable = false)
     private int stockQuantity;
+
+    @Column(nullable = false)
+    private boolean active = true;
 }

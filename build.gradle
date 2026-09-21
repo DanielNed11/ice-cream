@@ -37,6 +37,15 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-liquibase'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    // Not managed by the Spring Boot BOM, so versions are pinned here.
+    // Both are declared because the exporter imports from each: ss.usermodel
+    // (poi) and xssf.streaming (poi-ooxml). Keep the versions identical.
+    implementation 'org.apache.poi:poi:5.5.1'
+    implementation 'org.apache.poi:poi-ooxml:5.5.1'
+    implementation 'net.javacrumbs.shedlock:shedlock-spring:7.10.1'
+    implementation 'net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.10.1'
     testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
     testImplementation 'org.springframework.boot:spring-boot-testcontainers'
     testImplementation 'org.testcontainers:postgresql'

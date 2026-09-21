@@ -25,6 +25,9 @@ public class Order extends Auditable {
     @Column(nullable = false, length = 20)
     private OrderStatus status;
 
+    @Column(nullable = false, length = 8, unique = true, updatable = false)
+    private String reference;
+
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
 }

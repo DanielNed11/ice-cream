@@ -1,5 +1,6 @@
 package daniel.portfolio.icecream.service;
 
+import daniel.portfolio.icecream.exception.EmailAlreadyRegisteredException;
 import daniel.portfolio.icecream.logging.Sensitive;
 import daniel.portfolio.icecream.model.AppUser;
 import daniel.portfolio.icecream.model.Role;

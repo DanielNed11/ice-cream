@@ -57,10 +57,10 @@ public class AuthController {
 
     @PostMapping("/refresh")
     @RefreshApiDocs
-    public AuthResponse refresh(@RequestHeader(REFRESH_TOKEN_HEADER) String refreshToken) {
+    public ResponseEntity<@NonNull AuthResponse> refresh(@RequestHeader(REFRESH_TOKEN_HEADER) String refreshToken) {
         RefreshTokenService.RotatedTokens rotated = refreshTokenService.rotate(refreshToken);
         String accessToken = jwtService.generateToken(rotated.userId());
-        return new AuthResponse(accessToken, rotated.refreshToken());
+        return ResponseEntity.ok(new AuthResponse(accessToken, rotated.refreshToken()));
     }
 
     @PostMapping("/logout")

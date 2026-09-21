@@ -1,4 +1,4 @@
-package daniel.portfolio.icecream.security.jwt;
+package daniel.portfolio.icecream.exception;
 
 public class InvalidRefreshTokenException extends RuntimeException {
 

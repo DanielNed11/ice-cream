@@ -1,5 +1,7 @@
 package daniel.portfolio.icecream.service;
 
+import daniel.portfolio.icecream.exception.ProductNotAvailableException;
+import daniel.portfolio.icecream.exception.ProductNotFoundException;
 import daniel.portfolio.icecream.controller.response.CartItemResponse;
 import daniel.portfolio.icecream.controller.response.CartResponse;
 import daniel.portfolio.icecream.model.Cart;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static daniel.portfolio.icecream.constants.Constants.PRODUCT_NOT_AVAILABLE;
 import static daniel.portfolio.icecream.constants.Constants.PRODUCT_NOT_FOUND;
 
 @Service
@@ -33,6 +36,10 @@ public class CartService {
     public CartResponse upsertItem(UUID userId, String slug, int quantity) {
         Product product = productRepository.findBySlug(slug)
                 .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+
+        if (quantity > 0 && !product.isActive()) {
+            throw new ProductNotAvailableException(PRODUCT_NOT_AVAILABLE);
+        }
 
         Cart cart = cartRepository.findByAppUserId(userId)
                 .orElseGet(() -> createCart(userId));
@@ -59,18 +66,14 @@ public class CartService {
     @Transactional(readOnly = true)
     public CartResponse getCart(UUID userId) {
         Optional<Cart> cart = cartRepository.findByAppUserId(userId);
+
         if (cart.isEmpty()) {
             return new CartResponse(List.of(), BigDecimal.ZERO);
         }
 
-        List<CartItemResponse> items = cartItemRepository.findByCartId(cart.get().getId()).stream()
-                .map(cartItem -> new CartItemResponse(
-                        cartItem.getProduct().getSlug(),
-                        cartItem.getProduct().getName(),
-                        cartItem.getProduct().getPrice(),
-                        cartItem.getQuantity(),
-                        cartItem.getProduct().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()))
-                ))
+        List<CartItemResponse> items = cartItemRepository.findByCartId(cart.get().getId())
+                .stream()
+                .map(CartItemResponse::new)
                 .toList();
 
         BigDecimal totalPrice = items.stream()

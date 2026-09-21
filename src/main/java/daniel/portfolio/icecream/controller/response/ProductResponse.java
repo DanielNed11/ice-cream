@@ -6,6 +6,7 @@ public record ProductResponse(
         String slug,
         String name,
         BigDecimal price,
-        int stockQuantity
+        int stockQuantity,
+        boolean active
 ) {
 }
