@@ -131,6 +131,14 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.CONFLICT, PRODUCT_NOT_AVAILABLE, request);
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<@NonNull ErrorResponse> handleUserNotFound(
+            UserNotFoundException ex,
+            HttpServletRequest request
+    ) {
+        return build(HttpStatus.NOT_FOUND, USER_NOT_FOUND, request);
+    }
+
     @ExceptionHandler(OrderNotFoundException.class)
     public ResponseEntity<@NonNull ErrorResponse> handleOrderNotFound(
             OrderNotFoundException ex,

@@ -2,6 +2,8 @@ package daniel.portfolio.icecream.controller;
 
 import daniel.portfolio.icecream.constants.AuthApiPaths;
 import daniel.portfolio.icecream.controller.response.AuthResponse;
+import daniel.portfolio.icecream.controller.response.UserResponse;
+import daniel.portfolio.icecream.service.AppUserService;
 import daniel.portfolio.icecream.controller.request.LoginRequest;
 import daniel.portfolio.icecream.controller.request.RegisterRequest;
 import daniel.portfolio.icecream.security.CustomUser;
@@ -11,6 +13,7 @@ import daniel.portfolio.icecream.service.UserRegistrationService;
 import daniel.portfolio.icecream.swagger.LoginApiDocs;
 import daniel.portfolio.icecream.swagger.LogoutApiDocs;
 import daniel.portfolio.icecream.swagger.RefreshApiDocs;
+import daniel.portfolio.icecream.swagger.MeApiDocs;
 import daniel.portfolio.icecream.swagger.RegisterApiDocs;
 import jakarta.validation.Valid;
 import lombok.NonNull;
@@ -36,6 +39,7 @@ public class AuthController {
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final UserRegistrationService userRegistrationService;
+    private final AppUserService appUserService;
 
     @PostMapping("/register")
     @RegisterApiDocs
@@ -61,6 +65,12 @@ public class AuthController {
         RefreshTokenService.RotatedTokens rotated = refreshTokenService.rotate(refreshToken);
         String accessToken = jwtService.generateToken(rotated.userId());
         return ResponseEntity.ok(new AuthResponse(accessToken, rotated.refreshToken()));
+    }
+
+    @GetMapping("/me")
+    @MeApiDocs
+    public ResponseEntity<@NonNull UserResponse> me(@AuthenticationPrincipal CustomUser principal) {
+        return ResponseEntity.ok(appUserService.findProfile(principal.getId()));
     }
 
     @PostMapping("/logout")

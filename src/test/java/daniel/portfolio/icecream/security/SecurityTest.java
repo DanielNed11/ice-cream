@@ -149,6 +149,43 @@ public class SecurityTest {
         assertNotEquals("Str0ngPass!23", created.getPassword());
     }
 
+    // --- profile ---
+
+    @Test
+    public void meReturnsTheCallersOwnProfile() throws Exception {
+        AppUser customer = testHelper.customer("me@test.local");
+
+        mockMvc.perform(get("/api/auth/me").header("Authorization", "Bearer " + testHelper.token(customer)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("me@test.local"))
+                .andExpect(jsonPath("$.role").value("CUSTOMER"))
+                .andExpect(jsonPath("$.name").exists());
+    }
+
+    @Test
+    public void meNeverExposesThePasswordHash() throws Exception {
+        AppUser customer = testHelper.customer("me-safe@test.local");
+
+        mockMvc.perform(get("/api/auth/me").header("Authorization", "Bearer " + testHelper.token(customer)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.password").doesNotExist());
+    }
+
+    @Test
+    public void meReportsTheRoleSoTheFrontendCanRenderAdminLinks() throws Exception {
+        AppUser superAdmin = testHelper.superAdmin("me-super@test.local");
+
+        mockMvc.perform(get("/api/auth/me").header("Authorization", "Bearer " + testHelper.token(superAdmin)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.role").value("SUPERADMIN"));
+    }
+
+    @Test
+    public void meWithoutATokenIsUnauthorized() throws Exception {
+        mockMvc.perform(get("/api/auth/me"))
+                .andExpect(status().isUnauthorized());
+    }
+
     @AfterEach
     public void cleanup() {
         testHelper.cleanUp();

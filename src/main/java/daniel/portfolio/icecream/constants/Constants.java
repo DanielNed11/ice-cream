@@ -18,6 +18,8 @@ public class Constants {
 
     public static final int MAX_CART_ITEM_QUANTITY = 10;
 
+    public static final String USER_NOT_FOUND = "User not found";
+
     public static final String PRODUCT_NOT_AVAILABLE = "Product is no longer available";
     public static final String INSUFFICIENT_STOCK = "One or more items no longer have enough stock";
 
