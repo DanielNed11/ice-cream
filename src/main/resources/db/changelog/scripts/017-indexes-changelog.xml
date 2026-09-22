@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-5.0.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <!-- Postgres indexes primary keys and unique constraints automatically but
+         never foreign keys, so every join and every cascade below was a
+         sequential scan. Added now rather than earlier because the queries have
+         stopped changing: these cover the paths the application actually uses. -->
+
+    <!-- Order history for one customer, and the admin list's default sort. -->
+    <changeSet id="01-orders-app-user" author="daniel">
+        <createIndex tableName="orders" indexName="idx_orders_app_user_id">
+            <column name="app_user_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- The admin list filters and sorts on created_at, and the Excel export
+         walks it as the first half of its keyset cursor. -->
+    <changeSet id="02-orders-created-at" author="daniel">
+        <createIndex tableName="orders" indexName="idx_orders_created_at">
+            <column name="created_at"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- The nightly delivery sweep reads every PLACED order. -->
+    <changeSet id="03-orders-status" author="daniel">
+        <createIndex tableName="orders" indexName="idx_orders_status">
+            <column name="status"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Loading an order's lines, on every order detail and every email. -->
+    <changeSet id="04-order-item-order" author="daniel">
+        <createIndex tableName="order_item" indexName="idx_order_item_order_id">
+            <column name="order_id"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="05-order-item-product" author="daniel">
+        <createIndex tableName="order_item" indexName="idx_order_item_product_id">
+            <column name="product_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- sent_email cascades from orders, so a delete scans this table. -->
+    <changeSet id="06-sent-email-order" author="daniel">
+        <createIndex tableName="sent_email" indexName="idx_sent_email_order_id">
+            <column name="order_id"/>
+        </createIndex>
+    </changeSet>
+
+    <!-- Logout revokes every token a user holds. -->
+    <changeSet id="07-refresh-token-app-user" author="daniel">
+        <createIndex tableName="refresh_token" indexName="idx_refresh_token_app_user_id">
+            <column name="app_user_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

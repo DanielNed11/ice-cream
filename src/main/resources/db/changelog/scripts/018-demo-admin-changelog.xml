@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-5.0.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <!-- A read only-ish ADMIN account for the public demo, so a visitor can see
+         the admin panel without being promoted by hand. Guarded by the "demo"
+         context: it runs only where SPRING_LIQUIBASE_CONTEXTS=demo is set, so a
+         real deployment never gets an account with a published password.
+         The password hash was produced by the application's own encoder. -->
+    <changeSet id="01-demo-admin" author="daniel" context="demo">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM app_user WHERE email = 'demo.admin@nano-icecream.dev'
+            </sqlCheck>
+        </preConditions>
+
+        <insert tableName="app_user">
+            <column name="id" valueComputed="gen_random_uuid()"/>
+            <column name="name" value="Demo Admin"/>
+            <column name="email" value="demo.admin@nano-icecream.dev"/>
+            <column name="password" value="$2a$10$m87WrZGdapZ7yI6eIIjeluD6oUgjT2sFZ0Wsf7Bw0TIq8L/AF3lpm"/>
+            <column name="role" value="ADMIN"/>
+            <column name="created_at" valueComputed="now()"/>
+            <column name="updated_at" valueComputed="now()"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
