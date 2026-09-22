@@ -1,0 +1,10 @@
+services:
+  postgres-ice-cream-test:
+    image: postgres:17.6-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: "ice-cream-test"
+      POSTGRES_USER: "spring"
+      POSTGRES_PASSWORD: "spring"
+    ports:
+      - "5434:5432"
