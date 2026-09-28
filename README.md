@@ -89,19 +89,27 @@ docker compose -f docker-compose.test.yml up -d
 ./gradlew test
 ```
 
-## Deploying (Render)
+## Deploying (Railway)
 
-The `Dockerfile` is a two-stage build producing a JRE image that runs as a
-non-root user.
+Railway builds the `Dockerfile` in this repository and runs the image, so there
+is nothing platform-specific in the application itself.
 
-1. Create a **Web Service** from this repository, environment **Docker**.
-2. Health check path: `/actuator/health`
-3. Set the environment variables from the table above, plus
+1. New project → **Deploy from GitHub repo** → this repository.
+2. Railway detects the `Dockerfile`; `railway.json` sets the health check to
+   `/actuator/health`.
+3. Add the environment variables from the table above, plus
    `SPRING_PROFILES_ACTIVE=prod`.
-4. `PORT` is provided by Render and is read automatically.
+4. `PORT` is injected by Railway and is read automatically.
 
-Point `CORS_ALLOWED_ORIGINS` at your deployed frontend origin, and set the
-frontend's `NEXT_PUBLIC_API_URL` to this service's URL.
+Two things that are easy to get wrong:
+
+- **`DATASOURCE_URL` must be set and reachable.** The application connects
+  during startup to run migrations, so an unset or unreachable database means
+  the process never finishes booting and never opens a port. The platform
+  reports that as "no open ports", which points at the wrong problem.
+- **`CORS_ALLOWED_ORIGINS` must list the deployed frontend's origin**, not
+  `localhost`, or the browser blocks every request while both services look
+  healthy.
 
 ## Trying the admin panel
 
