@@ -20,4 +20,4 @@ COPY --from=build --chown=spring:spring /build/build/libs/*.jar app.jar
 ENV SPRING_PROFILES_ACTIVE=prod
 EXPOSE 8080
 
-ENTRYPOINT ["java", "-Djava.net.preferIPv4Stack=true", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
