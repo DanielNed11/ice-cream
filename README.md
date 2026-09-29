@@ -15,10 +15,10 @@ The storefront that consumes this API lives in a separate repository
 | Language / runtime | Java 25, Spring Boot 4.1 |
 | Data | PostgreSQL 17, Spring Data JPA (Hibernate 7), Liquibase |
 | Security | Spring Security 7, JWT access tokens with rotating refresh tokens |
-| Email | JavaMail + Thymeleaf templates, Mailpit in dev, Gmail SMTP in prod |
+| Email | Thymeleaf templates, SMTP to Mailpit in dev, Resend's HTTPS API in prod |
 | Scheduling | Spring scheduling on virtual threads, ShedLock for multi-instance locking |
 | Reporting | Apache POI (SXSSF) streaming Excel export |
-| Tests | JUnit 5 against a real Postgres container (67 tests) |
+| Tests | JUnit 5 against a real Postgres container (71 tests) |
 
 ## What it does
 
@@ -35,7 +35,10 @@ unique reference (`#B8B20784`) rather than their UUID.
 **Email** — multipart HTML and plain text confirmation, delivered and
 cancellation emails, sent after the transaction commits on a virtual thread, so
 a mail outage can never fail a purchase. Every attempt, sent or failed, is
-recorded in `sent_email`.
+recorded in `sent_email`. A `MailTransport` seam separates the message from the
+channel that carries it, so development keeps a local mail catcher while
+production posts to an HTTP API, and sends carry an idempotency key so a
+replayed event cannot deliver the same email twice.
 
 **Scheduled jobs** — a daily sweep marks orders delivered (marking *before*
 sending, so an order cancelled mid-run never receives a delivery email), and a
@@ -69,7 +72,9 @@ cp .env.example .env                 # then fill in the values below
 | `DATASOURCE_URL` | JDBC URL, e.g. `jdbc:postgresql://localhost:5432/ice-cream` |
 | `DATASOURCE_PASSWORD` | Database password |
 | `JWT_SECRET` | **Base64-encoded** signing key, at least 256 bits |
-| `MAIL_USERNAME` / `MAIL_PASSWORD` | SMTP account (a Gmail App Password in prod) |
+| `MAIL_USERNAME` | Sender address in development; Mailpit accepts anything |
+| `MAIL_FROM` | Sender address in production, on a domain verified in Resend |
+| `RESEND_API_KEY` | Resend API key; production only |
 | `FRONTEND_URL` | Link target in emails |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated origins allowed to call the API |
 
@@ -101,7 +106,13 @@ is nothing platform-specific in the application itself.
    `SPRING_PROFILES_ACTIVE=prod`.
 4. `PORT` is injected by Railway and is read automatically.
 
-Two things that are easy to get wrong:
+Three things that are easy to get wrong:
+
+- **Outbound SMTP does not work.** Railway drops connections on ports 25, 465,
+  587 and 2525, to every destination and on both address families; only 443
+  gets out. A mail library sees this as a connect timeout, which looks like bad
+  credentials and is not — authentication happens several phases later and that
+  code never runs. This is why production sends over HTTPS rather than SMTP.
 
 - **`DATASOURCE_URL` must be set and reachable.** The application connects
   during startup to run migrations, so an unset or unreachable database means
@@ -132,8 +143,10 @@ A few decisions that are deliberate rather than accidental:
   checkout produces one order, and locks product rows in a deterministic order
   so two concurrent checkouts cannot deadlock.
 - **Mail never gates a purchase.** Emails are sent after commit, on a virtual
-  thread, and the mail health indicator is disabled so an SMTP outage cannot
-  mark the service unhealthy.
+  thread, and the mail health indicator is disabled so a mail outage cannot
+  mark the service unhealthy. This was not theoretical: production spent a day
+  unable to send anything, and the only casualties were log lines and
+  `sent_email` rows marked `FAILED`.
 - **The Excel export uses keyset paging**, because each page is its own short
   transaction and an OFFSET would be computed against a different snapshot each
   time.
