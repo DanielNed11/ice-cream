@@ -12,7 +12,8 @@ RUN ./gradlew bootJar --no-daemon -x test
 FROM eclipse-temurin:25-jre
 WORKDIR /app
 
-RUN useradd --system --create-home --uid 10001 spring
+RUN useradd --system --create-home --uid 10001 spring && \
+    mkdir /app/logs && chown spring:spring /app/logs
 USER spring
 
 COPY --from=build --chown=spring:spring /build/build/libs/*.jar app.jar
