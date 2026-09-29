@@ -7,12 +7,11 @@ import daniel.portfolio.icecream.model.EmailType;
 import daniel.portfolio.icecream.model.SentEmail;
 import daniel.portfolio.icecream.repository.OrderRepository;
 import daniel.portfolio.icecream.repository.SentEmailRepository;
-import jakarta.mail.internet.MimeMessage;
+import daniel.portfolio.icecream.service.mail.MailTransport;
+import daniel.portfolio.icecream.service.mail.OutgoingEmail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -27,16 +26,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    // The sender address belongs to the transport, which owns the envelope.
+    private final MailTransport mailTransport;
     private final TemplateEngine templateEngine;
     private final OrderRepository orderRepository;
     private final SentEmailRepository sentEmailRepository;
-
-    @Value("${app.mail.from}")
-    private String from;
-
-    @Value("${app.mail.from-name}")
-    private String fromName;
 
     @Value("${app.frontend-url}")
     private String frontendUrl;
@@ -112,14 +106,8 @@ public class EmailService {
 
     private void send(UUID orderId, EmailType emailType, String recipient, String subject, EmailBody body) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(from, fromName);
-            helper.setTo(recipient);
-            helper.setSubject(subject);
-            helper.setText(body.text(), body.html());
-            mailSender.send(message);
+            mailTransport.send(new OutgoingEmail(
+                    orderId, emailType, recipient, subject, body.html(), body.text()));
 
             recordAttempt(orderId, emailType, recipient, subject, EmailStatus.SENT, null);
         } catch (Exception ex) {

@@ -6,13 +6,11 @@ spring:
   config:
     import: optional:file:.env[.properties]
   liquibase:
-    # Liquibase runs every changeset when no context is selected, so a context
-    # alone guards nothing. Selecting "default" here means context-tagged
-    # changesets (the demo admin) are skipped unless a deployment opts in with
-    # LIQUIBASE_CONTEXTS=default,demo.
     contexts: ${LIQUIBASE_CONTEXTS:default}
   jpa:
     open-in-view: false
+    hibernate:
+      ddl-auto: validate
   threads:
     virtual:
       enabled: true
@@ -25,17 +23,11 @@ spring:
           writetimeout: 10000
 
 server:
-  # Render (and most PaaS hosts) assign the port through PORT; Spring only
-  # reads SERVER_PORT, so it is mapped explicitly here.
   port: ${PORT:8080}
 
 management:
   health:
     mail:
-      # The mail indicator opens an SMTP connection on every health check, so an
-      # unreachable mail server marks the whole application DOWN and a platform
-      # health check restarts it. Sending mail is deliberately best effort here
-      # -- an outage must not fail an order -- so it does not gate liveness.
       enabled: false
 
 jwt:
@@ -64,17 +56,6 @@ spring:
   datasource:
     url: ${DATASOURCE_URL}
     password: ${DATASOURCE_PASSWORD}
-  mail:
-    host: smtp.gmail.com
-    port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
-    properties:
-      mail:
-        smtp:
-          auth: true
-          starttls:
-            enable: true
 
 springdoc:
   api-docs:
@@ -86,7 +67,9 @@ app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS}
   mail:
-    from: ${MAIL_USERNAME}
+    from: ${MAIL_FROM}
+    resend:
+      api-key: ${RESEND_API_KEY}
   frontend-url: ${FRONTEND_URL}
 
 ---
